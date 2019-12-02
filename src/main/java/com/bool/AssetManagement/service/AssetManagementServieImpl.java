@@ -2,6 +2,8 @@ package com.bool.AssetManagement.service;
 
 import com.bool.AssetManagement.domain.BookingObject;
 import com.bool.AssetManagement.domain.Vehicle;
+import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
+import com.bool.AssetManagement.exceptions.VehicleNotFoundException;
 import com.bool.AssetManagement.repository.VehicleRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.kafka.annotation.KafkaListener;
@@ -25,30 +27,45 @@ public class AssetManagementServieImpl implements AssetManagementService{
     List list = new ArrayList();
 
     @Override
-    public Vehicle saveVehicle(Vehicle vehicle){
+    public Vehicle saveVehicle(Vehicle vehicle) throws VehicleAlreadyExistsException {
+        if(vehicleRepository.existsById(vehicle.getId())){
+            throw new VehicleAlreadyExistsException("Vehicle Already Exists");
+        }
         Vehicle savedVehicle = vehicleRepository.save(vehicle);
+        if(savedVehicle == null){
+            throw new VehicleAlreadyExistsException("Vehicle Already Exists");
+        }
         return savedVehicle;
     }
 
     @Override
-    public List getAllVehicles() {
+    public List getAllVehicles(){
         List vehicleList = vehicleRepository.findAll();
         return vehicleList;
     }
 
     @Override
-    public Vehicle updateVehicle(Vehicle vehicle) {
+    public Vehicle updateVehicle(Vehicle vehicle) throws VehicleNotFoundException {
+        if(!(vehicleRepository.existsById(vehicle.getId()))){
+            throw new VehicleNotFoundException("Cant Update. Vehicle Not Found");
+        }
         return vehicleRepository.save(vehicle);
     }
 
     @Override
-    public boolean deleteVehicle(int no) {
+    public boolean deleteVehicle(int no) throws VehicleNotFoundException{
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant Delete. Vehicle Not Found");
+        }
         vehicleRepository.deleteById(no);
         return true;
     }
 
     @Override
-    public String getStatusOfVehicle(int no) {
+    public String getStatusOfVehicle(int no) throws VehicleNotFoundException {
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant retrieve Status. Vehicle Not Found");
+        }
         final String[] status = {null};
         Optional<Vehicle> vehicle1 = vehicleRepository.findById(no);
         vehicle1.ifPresent(f -> { status[0] = f.getStatus();});
@@ -57,7 +74,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
 
 
     @Override
-    public String getBatteryOfVehicle(int no) {
+    public String getBatteryOfVehicle(int no) throws VehicleNotFoundException{
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant retrive battery percentage. Vehicle Not Found");
+        }
         final String[] battery = {null};
        Optional<Vehicle> vehicle = vehicleRepository.findById(no);
        vehicle.ifPresent(f -> {battery[0]= String.valueOf(f.getCharge());});
@@ -65,7 +85,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
     }
 
     @Override
-    public String getCommentsOnVehicle(int no) {
+    public String getCommentsOnVehicle(int no) throws VehicleNotFoundException{
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant retrieve Comments. Vehicle Not Found");
+        }
         final String[] status = {null};
        Optional<Vehicle> vehicle=  vehicleRepository.findById(no);
        vehicle.ifPresent((f -> {status[0] = f.getFeedbackOrComments();}));
@@ -73,7 +96,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
     }
 
     @Override
-    public String getUsername(int rideCount,int no) {
+    public String getUsername(int rideCount,int no) throws VehicleNotFoundException{
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant retrieve UserName. Vehicle Not Found");
+        }
         final String[] status = {null};
         Optional<Vehicle> vehicle= Optional.ofNullable(vehicleRepository.rideOfVehicle(no, rideCount));
         vehicle.ifPresent((f -> {status[0] = f.getUsername();}));
@@ -82,7 +108,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
     }
 
     @Override
-    public String getRideCount(int no) {
+    public String getRideCount(int no) throws VehicleNotFoundException{
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant retrieve  RideCount. Vehicle Not Found");
+        }
         final String[] status = {null};
         Optional<Vehicle> vehicle=  vehicleRepository.findById(no);
         vehicle.ifPresent((f -> {status[0] = String.valueOf(f.getRideCount());}));
@@ -90,7 +119,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
     }
 
     @Override
-    public String  getInitMeterReading(int rideCount, int no) {
+    public String  getInitMeterReading(int rideCount, int no) throws VehicleNotFoundException {
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant get init Meter Reading. Vehicle Not Found");
+        }
         final String[] status = {null};
         Optional<Vehicle> vehicle= Optional.ofNullable(vehicleRepository.rideOfVehicle(no, rideCount));
         vehicle.ifPresent((f -> {status[0] = String.valueOf(f.getInitMeterReading());}));
@@ -98,7 +130,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
     }
 
     @Override
-    public String getFinalMeterReading(int rideCount, int no) {
+    public String getFinalMeterReading(int rideCount, int no) throws VehicleNotFoundException{
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant retrieve Final meter Reading. Vehicle Not Found");
+        }
         final String[] status = {null};
         Optional<Vehicle> vehicle= Optional.ofNullable(vehicleRepository.rideOfVehicle(no, rideCount));
         vehicle.ifPresent((f -> {status[0] = String.valueOf(f.getFinalMeterReading());}));
@@ -106,7 +141,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
     }
 
     @Override
-    public String getInitTime(int rideCount, int no) {
+    public String getInitTime(int rideCount, int no) throws VehicleNotFoundException {
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant retrieve Init. Vehicle Not Found");
+        }
         final String[] status = {null};
         Optional<Vehicle> vehicle= Optional.ofNullable(vehicleRepository.rideOfVehicle(no, rideCount));
         vehicle.ifPresent((f -> {status[0] = String.valueOf(f.getInitTime());}));
@@ -114,7 +152,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
     }
 //
     @Override
-    public String getDropTime(int rideCount, int no) {
+    public String getDropTime(int rideCount, int no) throws VehicleNotFoundException{
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant retrieve drop Time. Vehicle Not Found");
+        }
         final String[] status = {null};
         Optional<Vehicle> vehicle= Optional.ofNullable(vehicleRepository.rideOfVehicle(no, rideCount));
         vehicle.ifPresent((f -> {status[0] = String.valueOf(f.getDropTime());}));
@@ -123,7 +164,10 @@ public class AssetManagementServieImpl implements AssetManagementService{
 
 
     @Override
-    public String getStation(int rideCount, int no) {
+    public String getStation(int rideCount, int no) throws VehicleNotFoundException{
+        if(!(vehicleRepository.existsById(no))){
+            throw new VehicleNotFoundException("Cant Update. Vehicle Not Found");
+        }
         final String[] status = {null};
         Optional<Vehicle> vehicle= Optional.ofNullable(vehicleRepository.rideOfVehicle(no, rideCount));
         vehicle.ifPresent((f -> {status[0] = String.valueOf(f.getStation());}));

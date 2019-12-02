@@ -62,6 +62,7 @@
 
 package com.bool.AssetManagement.configuration;
 import com.bool.AssetManagement.domain.BookingObject;
+import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -78,6 +79,7 @@ import java.util.Map;
 @EnableKafka
 @Configuration
 public class KafkaConfig  {
+
 
     @Bean
     public ConsumerFactory<String, String> consumerFactory() {
@@ -97,6 +99,7 @@ public class KafkaConfig  {
     public ConcurrentKafkaListenerContainerFactory<String, String> kafkaListenerContainerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, String> factory = new ConcurrentKafkaListenerContainerFactory();
         factory.setConsumerFactory(consumerFactory());
+        factory.setMissingTopicsFatal(false);
         System.out.println("2");
         return factory;
     }
@@ -107,7 +110,7 @@ public class KafkaConfig  {
         Map<String, Object> config = new HashMap<>();
 
 //        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "172.23.239.104:9092");
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"172.23.239.104:9092");
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "group_json");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
@@ -120,8 +123,11 @@ public class KafkaConfig  {
     public ConcurrentKafkaListenerContainerFactory<String,BookingObject > userKafkaListenerFactory() {
         ConcurrentKafkaListenerContainerFactory<String, BookingObject> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(userConsumerFactory());
+        factory.setMissingTopicsFatal(false);
         System.out.println("4");
         return factory;
     }
+
+
 
 }
