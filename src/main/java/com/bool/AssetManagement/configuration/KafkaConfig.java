@@ -58,8 +58,6 @@
 //        return factory;
 //    }
 //}
-
-
 package com.bool.AssetManagement.configuration;
 import com.bool.AssetManagement.domain.BookingObject;
 import org.apache.kafka.clients.admin.NewTopic;
@@ -85,8 +83,8 @@ public class KafkaConfig  {
     public ConsumerFactory<String, String> consumerFactory() {
         Map<String, Object> config = new HashMap<>();
 
-//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "172.23.239.104:9092");
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "172.23.239.104:9092");
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "group_id");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
         config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
@@ -109,14 +107,20 @@ public class KafkaConfig  {
     public ConsumerFactory<String, BookingObject > userConsumerFactory() {
         Map<String, Object> config = new HashMap<>();
 
-//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
-        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"172.23.239.104:9092");
+        JsonDeserializer<BookingObject> deserializer = new JsonDeserializer<>(BookingObject.class);
+        deserializer.setRemoveTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"172.23.239.104:9092");
         config.put(ConsumerConfig.GROUP_ID_CONFIG, "group_json");
         config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
-        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+      //  config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
         System.out.println("3");
-        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),
-                new JsonDeserializer<>(BookingObject .class));
+       // return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),new JsonDeserializer<>(BookingObject .class));
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
     }
 
     @Bean
