@@ -4,6 +4,7 @@ import com.bool.AssetManagement.domain.Asset;
 import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
 import com.bool.AssetManagement.exceptions.VehicleNotFoundException;
 import org.springframework.stereotype.Service;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
 import java.util.List;
@@ -14,4 +15,5 @@ public interface AssetCRUDService {
     List getAllAssets() throws IOException;
     Asset updateAsset(Asset asset) throws VehicleNotFoundException;
     boolean deleteAsset(int no) throws VehicleNotFoundException;
+    String uploadFile(MultipartFile multipartFile) throws IOException;
 }

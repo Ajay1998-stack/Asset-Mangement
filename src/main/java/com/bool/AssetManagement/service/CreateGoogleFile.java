@@ -34,13 +34,13 @@ public class CreateGoogleFile {
         return _createGoogleFile(googleFolderIdParent, contentType, customFileName, uploadStreamContent);
     }
 
-//    // Create Google File from java.io.File
-//    public static File createGoogleFile(String googleFolderIdParent, String contentType, //
-//                                        String customFileName, java.io.File uploadFile) throws IOException {
-//        AbstractInputStreamContent uploadStreamContent = new FileContent(contentType, uploadFile);
-//        return _createGoogleFile(googleFolderIdParent, contentType, customFileName, uploadStreamContent);
-//    }
-////
+    // Create Google File from java.io.File
+    public static File createGoogleFile(String googleFolderIdParent, String contentType, //
+                                        String customFileName, java.io.File uploadFile) throws IOException {
+        AbstractInputStreamContent uploadStreamContent = new FileContent(contentType, uploadFile);
+        return _createGoogleFile(googleFolderIdParent, contentType, customFileName, uploadStreamContent);
+    }
+
 //    public static void main(String[] args) throws IOException {
 //        java.io.File uploadFile = new java.io.File("/home/cgi/index.jpeg");
 //        // Create Google File:
