@@ -59,8 +59,7 @@
 //    }
 //}
 package com.bool.AssetManagement.configuration;
-import com.bool.AssetManagement.domain.BookingObject;
-import org.apache.kafka.clients.admin.NewTopic;
+import com.bool.AssetManagement.domain.RideStart;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
 import org.springframework.context.annotation.Bean;
@@ -104,10 +103,10 @@ public class KafkaConfig  {
 
 
     @Bean
-    public ConsumerFactory<String, BookingObject > userConsumerFactory() {
+    public ConsumerFactory<String, RideStart> userConsumerFactory() {
         Map<String, Object> config = new HashMap<>();
 
-        JsonDeserializer<BookingObject> deserializer = new JsonDeserializer<>(BookingObject.class);
+        JsonDeserializer<RideStart> deserializer = new JsonDeserializer<>(RideStart.class);
         deserializer.setRemoveTypeHeaders(false);
         deserializer.addTrustedPackages("*");
         deserializer.setUseTypeMapperForKey(true);
@@ -124,8 +123,8 @@ public class KafkaConfig  {
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String,BookingObject > userKafkaListenerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, BookingObject> factory = new ConcurrentKafkaListenerContainerFactory<>();
+    public ConcurrentKafkaListenerContainerFactory<String, RideStart> userKafkaListenerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, RideStart> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(userConsumerFactory());
         factory.setMissingTopicsFatal(false);
         System.out.println("4");

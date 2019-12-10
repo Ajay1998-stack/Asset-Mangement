@@ -13,7 +13,7 @@ import java.util.List;
 public interface AssetCRUDService {
     Asset saveAsset(Asset asset) throws VehicleAlreadyExistsException;
     List getAllAssets() throws IOException;
-    Asset updateAsset(Asset asset) throws VehicleNotFoundException;
+    Asset updateAsset(Asset asset) throws VehicleNotFoundException, IOException;
     boolean deleteAsset(int no) throws VehicleNotFoundException;
     String uploadFile(MultipartFile multipartFile) throws IOException;
 }

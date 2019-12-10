@@ -6,10 +6,12 @@ import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
 import com.bool.AssetManagement.exceptions.VehicleNotFoundException;
 import com.bool.AssetManagement.repository.AssetDetailsRepository;
 import com.bool.AssetManagement.service.AssetCRUDService;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.io.DataInput;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -49,11 +51,13 @@ public class AssetCRUDServiceImpl implements AssetCRUDService {
     }
 
     @Override
-    public Asset updateAsset(Asset asset) throws VehicleNotFoundException {
+    public Asset updateAsset(Asset asset) throws VehicleNotFoundException, IOException {
+        Asset jsonAsset = new ObjectMapper().readValue((DataInput) asset, Asset.class);
+        System.out.println(jsonAsset);
         if (!(assetDetailsRepository.existsById(asset.getVehicleNo()))) {
             throw new VehicleNotFoundException("Cant Update. Asset Not Found");
         }
-        return assetDetailsRepository.save(asset);
+        return assetDetailsRepository.save(jsonAsset);
     }
 
     @Override

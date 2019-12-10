@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class BookingObject {
+public class RideStart {
     private String vehicle_id ;
     private String user_id ;
     private int initial_meter_reading;

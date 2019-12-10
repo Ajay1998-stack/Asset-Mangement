@@ -3,7 +3,7 @@ package com.bool.AssetManagement.controller;
 //import com.bool.AssetManagement.domain.KakfaObject;
 
 import com.bool.AssetManagement.domain.AdminObject;
-import com.bool.AssetManagement.domain.BookingObject;
+import com.bool.AssetManagement.domain.RideStart;
 import com.bool.AssetManagement.domain.AssetHistory;
 import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
 import com.bool.AssetManagement.service.AssetManagementService;
@@ -178,7 +178,7 @@ public class AssetHistoryController {
     }
 
     @KafkaListener(topics = "KafkaStartRide", groupId = "group_json",containerFactory = "userKafkaListenerFactory")
-        public void consumeJson(BookingObject bookingObject) {
+        public void consumeJson(RideStart bookingObject) {
         System.out.println("Consumed JSON Message: " + bookingObject);
         System.out.println("6");
         AdminObject adminObject  = new AdminObject();

@@ -12,7 +12,8 @@ import com.google.api.client.http.FileContent;
 import com.google.api.services.drive.Drive;
 import com.google.api.services.drive.model.File;
 
-public class CreateGoogleFile {
+public class
+CreateGoogleFile {
 
     private static File _createGoogleFile(String googleFolderIdParent, String contentType,
                                           String customFileName, AbstractInputStreamContent uploadStreamContent) throws IOException {
