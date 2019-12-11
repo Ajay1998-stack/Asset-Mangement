@@ -34,7 +34,7 @@ public class AssetCRUDServiceImpl implements AssetCRUDService {
 
     @Override
     public Asset saveAsset(Asset asset) throws VehicleAlreadyExistsException {
-        if (assetDetailsRepository.existsById(asset.getVehicleNo())) {
+        if (assetDetailsRepository.existsByRegNo(asset.getRegNo())) {
             throw new VehicleAlreadyExistsException("Asset Already Exists");
         }
         Asset savedAsset = assetDetailsRepository.save(asset);
@@ -54,19 +54,19 @@ public class AssetCRUDServiceImpl implements AssetCRUDService {
     public Asset updateAsset(Asset asset) throws VehicleNotFoundException, IOException {
         Asset jsonAsset = new ObjectMapper().readValue((DataInput) asset, Asset.class);
         System.out.println(jsonAsset);
-        if (!(assetDetailsRepository.existsById(asset.getVehicleNo()))) {
+        if (!(assetDetailsRepository.existsByRegNo(asset.getRegNo()))) {
             throw new VehicleNotFoundException("Cant Update. Asset Not Found");
         }
         return assetDetailsRepository.save(jsonAsset);
     }
 
     @Override
-    public boolean deleteAsset(int no) throws VehicleNotFoundException {
-        if (!(assetDetailsRepository.existsById(no))) {
-            throw new VehicleNotFoundException("Cant Delete. Asset with that ID Not Found");
+    public long deleteAsset(String regNo) throws VehicleNotFoundException {
+        if (!(assetDetailsRepository.existsByRegNo(regNo))) {
+            throw new VehicleNotFoundException("Cant Delete. Asset with that RegNo Not Found");
         }
-        assetDetailsRepository.deleteById(no);
-        return true;
+
+        return assetDetailsRepository.deleteByRegNo(regNo);
     }
 
     @Override

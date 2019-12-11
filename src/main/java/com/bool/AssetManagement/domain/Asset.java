@@ -9,8 +9,8 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Asset {
-    private String regNo;
     @Id
+    private String regNo;
     private int vehicleNo;
     private int charge; //end
     private int meterReading;

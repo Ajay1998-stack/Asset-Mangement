@@ -5,6 +5,7 @@ package com.bool.AssetManagement.controller;
 import com.bool.AssetManagement.domain.AdminObject;
 import com.bool.AssetManagement.domain.RideStart;
 import com.bool.AssetManagement.domain.AssetHistory;
+import com.bool.AssetManagement.exceptions.BookingAlreadyExistsException;
 import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
 import com.bool.AssetManagement.service.AssetManagementService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,6 +16,7 @@ import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.UUID;
 
 import static java.lang.Integer.parseInt;
 
@@ -38,7 +40,7 @@ public class AssetHistoryController {
         try {
             assetManagementService.saveVehicle(assetHistory);
             responseEntity = new ResponseEntity<AssetHistory>(assetHistory, HttpStatus.CREATED);
-        }catch (B ex){
+        }catch (BookingAlreadyExistsException ex){
             responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
         }
         return responseEntity;
@@ -63,7 +65,7 @@ public class AssetHistoryController {
     }
 
     @DeleteMapping("assetHisUpdate/{id}")
-    public ResponseEntity<?> deleteVehicle(@PathVariable("id") int id){
+    public ResponseEntity<?> deleteVehicle(@PathVariable("id") UUID id){
     ResponseEntity responseEntity;
     try {
         assetManagementService.deleteVehicle(id);
@@ -76,7 +78,7 @@ public class AssetHistoryController {
 
 
     @GetMapping("count/{id}")
-    public ResponseEntity<?> getRideCountOfVehicle(@PathVariable("id") int id){
+    public ResponseEntity<?> getRideCountOfVehicle(@PathVariable("id") UUID id){
         ResponseEntity responseEntity;
         try {
             return new ResponseEntity<>(assetManagementService.getRideCount(id), HttpStatus.OK);
@@ -87,7 +89,7 @@ public class AssetHistoryController {
     }
 
     @GetMapping("user/{id1}/{id2}")
-    public ResponseEntity<?> getUsername(@PathVariable("id1") int id,@PathVariable("id2") int rideCount){
+    public ResponseEntity<?> getUsername(@PathVariable("id1") UUID id,@PathVariable("id2") int rideCount){
         ResponseEntity responseEntity;
         try {
             return new ResponseEntity<>(assetManagementService.getUsername(rideCount, id), HttpStatus.OK);

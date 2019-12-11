@@ -20,7 +20,7 @@ public class CredentialStoringServiceImpl implements CredentialStoringService {
 
     @Override
     public DataAccessObject saveCredentials(DataAccessObject dataAccessObject) throws VehicleAlreadyExistsException {
-        if(authDetailsRepository.existsById(dataAccessObject.getVehicleNo())){
+        if(authDetailsRepository.existsByRegNo(dataAccessObject.getRegNo())){
             throw new VehicleAlreadyExistsException("Vehicle Already Exists");
         }
         DataAccessObject savedCredentials = authDetailsRepository.save(dataAccessObject);

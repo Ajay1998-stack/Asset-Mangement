@@ -27,6 +27,7 @@ import static com.bool.AssetManagement.service.CreateGoogleFile.createGoogleFile
 import static java.lang.Integer.parseInt;
 
 @RestController
+@CrossOrigin("*")
 @RequestMapping(value = "/api/v1")
 public class AssetController {
 
@@ -73,7 +74,6 @@ public class AssetController {
             DataAccessObject dataAccessObject = new DataAccessObject();
             dataAccessObject.setRegNo(jsonAsset.getRegNo());
             dataAccessObject.setPassword(jsonAsset.getRegNo());
-            dataAccessObject.setVehicleNo(jsonAsset.getVehicleNo());
             credentialStoringService.saveCredentials(dataAccessObject);
             responseEntity = new ResponseEntity<Asset>(jsonAsset, HttpStatus.CREATED);
         }catch (IOException | VehicleAlreadyExistsException ex){
@@ -118,12 +118,13 @@ public class AssetController {
         return responseEntity;
     }
 
-    @DeleteMapping("/assetUpdate/{id}")
-    public ResponseEntity<?> deleteAsset(@PathVariable("id") int id){
+    @DeleteMapping("/assetUpdate/{regNo}")
+    public ResponseEntity<?> deleteAsset(@PathVariable("regNo") String regNo){
+        System.out.println("IS this getting executed !!" + " " + regNo);
         ResponseEntity responseEntity;
         try {
-            assetCRUDService.deleteAsset(id);
-            return new ResponseEntity<>(assetCRUDService.getAllAssets(), HttpStatus.OK);
+//            assetCRUDService.deleteAsset(regNo);
+            return new ResponseEntity<>(assetCRUDService.deleteAsset(regNo), HttpStatus.OK);
         }catch (Exception ex){
             responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
         }
@@ -200,13 +201,12 @@ public class AssetController {
 
 
         AssetHistory assetHistory = new AssetHistory();
-        assetHistory.setId(parseInt(rideEnd.getUser_id()));
+        assetHistory.setUsername(rideEnd.getUser_id());
         assetHistory.setInitTime(rideEnd.getStarttime());
         assetHistory.setDropTime(rideEnd.getEndtime());
         assetHistory.setFeedbackOrComments(rideEnd.getComments());
         assetHistory.setInitMeterReading(rideEnd.getInitial_meter_reading());
         assetHistory.setFinalMeterReading(rideEnd.getFinal_meter_reading());
-        assetHistory.setUsername(rideEnd.getUser_id());
         assetHistory.setStation(rideEnd.getEnd_station());
         assetHistory.setTotalDistance(rideEnd.getFinal_meter_reading()-rideEnd.getInitial_meter_reading());
         assetHistory.setBookingID(rideEnd.getBooking_id());
@@ -215,7 +215,7 @@ public class AssetController {
             assetManagementService.saveVehicle(assetHistory);
             System.out.println("assetHistory stored");
         }catch (BookingAlreadyExistsException ex){
-            System.out.println("");
+            System.out.println("booking already exists");
         }
 
     }

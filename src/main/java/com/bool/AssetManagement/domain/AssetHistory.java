@@ -17,8 +17,8 @@ import java.util.UUID;
 //@Entity
 public class AssetHistory {
 
-     @Id
-     int id; //regno
+
+     String regNo; //regno
      int charge; //console //charge at the end of ride
      String username;  //booking // username might be same
      int initMeterReading; //booking
@@ -30,6 +30,7 @@ public class AssetHistory {
      String feedbackOrComments; //booking
      //String status; //booking
      String station; //booking
+     @Id
      UUID bookingID;
 
 }

@@ -14,6 +14,6 @@ public interface AssetCRUDService {
     Asset saveAsset(Asset asset) throws VehicleAlreadyExistsException;
     List getAllAssets() throws IOException;
     Asset updateAsset(Asset asset) throws VehicleNotFoundException, IOException;
-    boolean deleteAsset(int no) throws VehicleNotFoundException;
+    long deleteAsset(String regNo) throws VehicleNotFoundException;
     String uploadFile(MultipartFile multipartFile) throws IOException;
 }
