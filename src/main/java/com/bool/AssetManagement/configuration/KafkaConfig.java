@@ -59,6 +59,7 @@
 //    }
 //}
 package com.bool.AssetManagement.configuration;
+import com.bool.AssetManagement.domain.RideEnd;
 import com.bool.AssetManagement.domain.RideStart;
 import org.apache.kafka.clients.consumer.ConsumerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
@@ -131,6 +132,37 @@ public class KafkaConfig  {
         return factory;
     }
 
+
+
+
+    @Bean
+    public ConsumerFactory<String, RideEnd> userConsumerFactory2() {
+        Map<String, Object> config = new HashMap<>();
+
+        JsonDeserializer<RideEnd> deserializer = new JsonDeserializer<>(RideEnd.class);
+        deserializer.setRemoveTypeHeaders(false);
+        deserializer.addTrustedPackages("*");
+        deserializer.setUseTypeMapperForKey(true);
+
+        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG, "127.0.0.1:9092");
+//        config.put(ConsumerConfig.BOOTSTRAP_SERVERS_CONFIG,"172.23.239.104:9092");
+        config.put(ConsumerConfig.GROUP_ID_CONFIG, "group_json2");
+        config.put(ConsumerConfig.KEY_DESERIALIZER_CLASS_CONFIG, StringDeserializer.class);
+        //  config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, JsonDeserializer.class);
+        config.put(ConsumerConfig.VALUE_DESERIALIZER_CLASS_CONFIG, deserializer);
+        System.out.println("7");
+        // return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(),new JsonDeserializer<>(BookingObject .class));
+        return new DefaultKafkaConsumerFactory<>(config, new StringDeserializer(), deserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, RideEnd> userKafkaListenerFactory2() {
+        ConcurrentKafkaListenerContainerFactory<String, RideEnd> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(userConsumerFactory2());
+        factory.setMissingTopicsFatal(false);
+        System.out.println("8");
+        return factory;
+    }
 
 
 }

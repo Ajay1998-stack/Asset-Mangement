@@ -8,12 +8,12 @@ import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.io.Serializable;
 
-@Document
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
 public class JwtRequest implements Serializable {
     @Id
-    private String username;
+    private String regNo    ;
     private String password;
 }

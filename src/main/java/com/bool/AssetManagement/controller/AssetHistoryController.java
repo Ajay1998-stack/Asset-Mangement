@@ -38,7 +38,7 @@ public class AssetHistoryController {
         try {
             assetManagementService.saveVehicle(assetHistory);
             responseEntity = new ResponseEntity<AssetHistory>(assetHistory, HttpStatus.CREATED);
-        }catch (VehicleAlreadyExistsException ex){
+        }catch (B ex){
             responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
         }
         return responseEntity;
@@ -74,29 +74,6 @@ public class AssetHistoryController {
         return responseEntity;
     }
 
-    @GetMapping("battery/{id}")
-    public ResponseEntity<?> getBatteryOfVehicle(@PathVariable("id") int id){
-        ResponseEntity responseEntity;
-        try {
-            return new ResponseEntity<String>(assetManagementService.getBatteryOfVehicle(id), HttpStatus.OK);
-        }catch (Exception ex){
-            responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
-        }
-        return responseEntity;
-    }
-
-
-    @GetMapping("comments/{id}")
-    public ResponseEntity<?> getCommentsOnVehicle(@PathVariable("id") int id){
-        ResponseEntity responseEntity;
-        try {
-            return new ResponseEntity<String>(assetManagementService.getCommentsOnVehicle(id), HttpStatus.OK);
-        }
-        catch (Exception ex){
-            responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
-        }
-        return responseEntity;
-    }
 
     @GetMapping("count/{id}")
     public ResponseEntity<?> getRideCountOfVehicle(@PathVariable("id") int id){
@@ -120,74 +97,8 @@ public class AssetHistoryController {
         return responseEntity;
     }
 
-    @GetMapping("ReadingInit/{id1}/{id2}")
-    public ResponseEntity<?> getInitMeterReading(@PathVariable("id1") int id,@PathVariable("id2") int rideCount){
-        ResponseEntity responseEntity;
-        try {
-            return new ResponseEntity<>(assetManagementService.getInitMeterReading(rideCount, id), HttpStatus.OK);
-        }catch (Exception ex){
-            responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
-        }
-        return responseEntity;
-    }
-
-    @GetMapping("ReadingDrop/{id1}/{id2}")
-    public ResponseEntity<?> getFinalMeterReading(@PathVariable("id1") int id,@PathVariable("id2") int rideCount){
-        ResponseEntity responseEntity;
-        try {
-            return new ResponseEntity<>(assetManagementService.getFinalMeterReading(rideCount, id), HttpStatus.OK);
-        }catch (Exception ex){
-            responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
-        }
-        return responseEntity;
-    }
 
 
-    @GetMapping("TimeInit/{id1}/{id2}")
-    public ResponseEntity<?> getInitTime(@PathVariable("id1") int id,@PathVariable("id2") int rideCount){
-        ResponseEntity responseEntity;
-        try{
-        return new ResponseEntity<>(assetManagementService.getInitTime(rideCount,id),HttpStatus.OK);
-        }catch (Exception ex){
-            responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
-        }
-        return responseEntity;
-    }
-
-    @GetMapping("TimeDrop/{id1}/{id2}")
-    public ResponseEntity<?> getDropTime(@PathVariable("id1") int id,@PathVariable("id2") int rideCount){
-        ResponseEntity responseEntity;
-        try {
-            return new ResponseEntity<>(assetManagementService.getDropTime(rideCount, id), HttpStatus.OK);
-        }
-        catch (Exception ex){
-            responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
-        }
-        return responseEntity;
-    }
-
-    @GetMapping("station/{id1}/{id2}")
-    public ResponseEntity<?> getStation(@PathVariable("id1") int id,@PathVariable("id2") int rideCount){
-        ResponseEntity responseEntity;
-        try {
-            return new ResponseEntity<>(assetManagementService.getStation(rideCount, id), HttpStatus.OK);
-        }catch (Exception ex){
-            responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
-        }
-        return responseEntity;
-    }
-
-    @KafkaListener(topics = "KafkaStartRide", groupId = "group_json",containerFactory = "userKafkaListenerFactory")
-        public void consumeJson(RideStart bookingObject) {
-        System.out.println("Consumed JSON Message: " + bookingObject);
-        System.out.println("6");
-        AdminObject adminObject  = new AdminObject();
-        adminObject.setId(parseInt(bookingObject.getUser_id()));
-        adminObject.setStation(bookingObject.getStart_station());
-        adminObject.setStatus(bookingObject.getVehicle_status());
-        adminObject.setFeedbackOrComments(bookingObject.getComments());
-        template.convertAndSend("/topic/adminUI",adminObject);
-    }
 
 //    @Autowired
 //    KafkaTemplate<String, KakfaObject> KafkaJsontemplate;

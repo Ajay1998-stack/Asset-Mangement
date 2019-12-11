@@ -6,6 +6,9 @@ import lombok.NoArgsConstructor;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
+import java.sql.Timestamp;
+import java.util.UUID;
+
 
 @Document
 @Data
@@ -21,11 +24,12 @@ public class AssetHistory {
      int initMeterReading; //booking
      int finalMeterReading; //booking
      int rideCount; //
-     String initTime; //booking
-     String dropTime; //booking
+     java.sql.Timestamp initTime; //booking
+     Timestamp dropTime; //booking
      int totalDistance; //
-     String feedbackOrComments; //
+     String feedbackOrComments; //booking
      //String status; //booking
      String station; //booking
+     UUID bookingID;
 
 }

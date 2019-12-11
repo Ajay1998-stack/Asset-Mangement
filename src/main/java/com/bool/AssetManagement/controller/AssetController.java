@@ -1,10 +1,10 @@
 package com.bool.AssetManagement.controller;
 
 import com.bool.AssetManagement.domain.*;
-import com.bool.AssetManagement.service.JwtTokenUtil;
+import com.bool.AssetManagement.exceptions.BookingAlreadyExistsException;
+import com.bool.AssetManagement.repository.AuthDetailsRepository;
+import com.bool.AssetManagement.service.*;
 import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
-import com.bool.AssetManagement.service.AssetCRUDService;
-import com.bool.AssetManagement.service.JwtUserDetailsService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.services.drive.model.File;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,23 +30,27 @@ import static java.lang.Integer.parseInt;
 @RequestMapping(value = "/api/v1")
 public class AssetController {
 
-    @Autowired
     private SimpMessagingTemplate template;
-
-    private AssetCRUDService assetCRUDService;
-    @Autowired
-    public  AssetController(AssetCRUDService assetCRUDService){
-        this.assetCRUDService = assetCRUDService;
-    }
-
-    @Autowired
-    private AuthenticationManager authenticationManager;
-
-    @Autowired
     private JwtTokenUtil jwtTokenUtil;
+    private JwtUserDetailsService userDetailsService;
+    private AssetCRUDService assetCRUDService;
+    private AuthenticationManager authenticationManager;
+    private CredentialStoringService credentialStoringService;
+    private AssetManagementService assetManagementService;
+
 
     @Autowired
-    private JwtUserDetailsService userDetailsService;
+    public  AssetController(AssetCRUDService assetCRUDService,AuthenticationManager authenticationManager,SimpMessagingTemplate template,JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService,CredentialStoringService credentialStoringService,AssetManagementService assetManagementService){
+
+        this.assetCRUDService = assetCRUDService;
+        this.authenticationManager=  authenticationManager;
+        this.template= template;
+        this.jwtTokenUtil = jwtTokenUtil;
+        this.userDetailsService = userDetailsService;
+        this.credentialStoringService = credentialStoringService;
+        this.assetManagementService = assetManagementService;
+
+    }
 
     @PostMapping("/assetentry" )
     public ResponseEntity<?> SaveAsset(@RequestParam String asset,@RequestParam MultipartFile image){
@@ -66,6 +70,11 @@ public class AssetController {
             System.out.println("Done!");
             jsonAsset.setPhotoUrl(googleFile.getWebContentLink());
             assetCRUDService.saveAsset(jsonAsset);
+            DataAccessObject dataAccessObject = new DataAccessObject();
+            dataAccessObject.setRegNo(jsonAsset.getRegNo());
+            dataAccessObject.setPassword(jsonAsset.getRegNo());
+            dataAccessObject.setVehicleNo(jsonAsset.getVehicleNo());
+            credentialStoringService.saveCredentials(dataAccessObject);
             responseEntity = new ResponseEntity<Asset>(jsonAsset, HttpStatus.CREATED);
         }catch (IOException | VehicleAlreadyExistsException ex){
             responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
@@ -138,14 +147,14 @@ public class AssetController {
 
     @PostMapping("/authenticate")
     public ResponseEntity<?> createAuthenticationToken(@RequestBody JwtRequest authenticationRequest) throws Exception {
-        authenticate(authenticationRequest.getUsername(), authenticationRequest.getPassword());
-        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getUsername());
+        authenticate(authenticationRequest.getRegNo(), authenticationRequest.getPassword());
+        final UserDetails userDetails = userDetailsService.loadUserByUsername(authenticationRequest.getRegNo());
         final String token = jwtTokenUtil.generateToken(userDetails);
         return ResponseEntity.ok(new JwtResponse(token));
     }
-        private void authenticate(String username, String password) throws Exception {
+        private void authenticate(String regNo, String password) throws Exception {
             try {
-                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(username, password));
+                authenticationManager.authenticate(new UsernamePasswordAuthenticationToken(regNo, password));
                 } catch (DisabledException e) {
                     throw new Exception("USER_DISABLED", e);
                 } catch (BadCredentialsException e) {
@@ -177,15 +186,37 @@ public class AssetController {
     }
 
 
-    @KafkaListener(topics = "KafkaEndRide", groupId = "group_json",containerFactory = "userKafkaListenerFactory")
-    public void consumeJson(RideEnd rideEnd) {
+    @KafkaListener(topics = "KafkaEndRide", groupId = "group_json2",containerFactory = "userKafkaListenerFactory2")
+    public void consumeJson(RideEnd rideEnd) throws VehicleAlreadyExistsException {
         System.out.println("Consumed JSON Message: " + rideEnd);
         System.out.println("6");
+
         AdminObject adminObject  = new AdminObject();
         adminObject.setId(parseInt(rideEnd.getUser_id()));
-        adminObject.setStation(rideEnd.getStart_station());
+        adminObject.setStation(rideEnd.getEnd_station());
         adminObject.setStatus(rideEnd.getVehicle_status());
         adminObject.setFeedbackOrComments(rideEnd.getComments());
         template.convertAndSend("/topic/adminUI",adminObject);
+
+
+        AssetHistory assetHistory = new AssetHistory();
+        assetHistory.setId(parseInt(rideEnd.getUser_id()));
+        assetHistory.setInitTime(rideEnd.getStarttime());
+        assetHistory.setDropTime(rideEnd.getEndtime());
+        assetHistory.setFeedbackOrComments(rideEnd.getComments());
+        assetHistory.setInitMeterReading(rideEnd.getInitial_meter_reading());
+        assetHistory.setFinalMeterReading(rideEnd.getFinal_meter_reading());
+        assetHistory.setUsername(rideEnd.getUser_id());
+        assetHistory.setStation(rideEnd.getEnd_station());
+        assetHistory.setTotalDistance(rideEnd.getFinal_meter_reading()-rideEnd.getInitial_meter_reading());
+        assetHistory.setBookingID(rideEnd.getBooking_id());
+
+        try {
+            assetManagementService.saveVehicle(assetHistory);
+            System.out.println("assetHistory stored");
+        }catch (BookingAlreadyExistsException ex){
+            System.out.println("");
+        }
+
     }
 }
