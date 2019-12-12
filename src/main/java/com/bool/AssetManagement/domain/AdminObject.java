@@ -10,7 +10,7 @@ import org.springframework.data.annotation.Id;
 @AllArgsConstructor
 public class AdminObject {
     @Id
-    int id;
+    String regNo;
     String feedbackOrComments;
     String status;
     String station;

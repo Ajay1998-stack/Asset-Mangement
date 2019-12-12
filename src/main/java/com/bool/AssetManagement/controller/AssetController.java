@@ -179,7 +179,7 @@ public class AssetController {
         System.out.println("Consumed JSON Message: " + rideStart);
         System.out.println("6");
         AdminObject adminObject  = new AdminObject();
-        adminObject.setId(parseInt(rideStart.getUser_id()));
+        adminObject.setRegNo(rideStart.getVehicle_id());
         adminObject.setStation(rideStart.getStart_station());
         adminObject.setStatus(rideStart.getVehicle_status());
         adminObject.setFeedbackOrComments(rideStart.getComments());
@@ -193,18 +193,20 @@ public class AssetController {
         System.out.println("6");
 
         AdminObject adminObject  = new AdminObject();
-        adminObject.setId(parseInt(rideEnd.getUser_id()));
+        adminObject.setRegNo((rideEnd.getVehicle_id()));
         adminObject.setStation(rideEnd.getEnd_station());
         adminObject.setStatus(rideEnd.getVehicle_status());
         adminObject.setFeedbackOrComments(rideEnd.getComments());
-        template.convertAndSend("/topic/adminUI",adminObject);
+        template.convertAndSend("/topic/history",adminObject);
 
 
         AssetHistory assetHistory = new AssetHistory();
+        assetHistory.setRegNo(rideEnd.getVehicle_id());
         assetHistory.setUsername(rideEnd.getUser_id());
         assetHistory.setInitTime(rideEnd.getStarttime());
         assetHistory.setDropTime(rideEnd.getEndtime());
-        assetHistory.setFeedbackOrComments(rideEnd.getComments());
+        assetHistory.setStatus(rideEnd.getVehicle_status());
+       // assetHistory.setFeedbackOrComments(rideEnd.getComments());
         assetHistory.setInitMeterReading(rideEnd.getInitial_meter_reading());
         assetHistory.setFinalMeterReading(rideEnd.getFinal_meter_reading());
         assetHistory.setStation(rideEnd.getEnd_station());

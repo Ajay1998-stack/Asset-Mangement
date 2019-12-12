@@ -53,8 +53,8 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity httpSecurity) throws Exception {
         // We don't need CSRF for this example
         httpSecurity.csrf().disable()
-                // dont authenticate this particular request
-                .authorizeRequests().antMatchers("/api/v1/authenticate","/api/v1/assetentry","/api/v1/assetUpdate","/api/v1/assetUpdate/**").permitAll().
+                .cors().and()// dont authenticate this particular request
+                .authorizeRequests().antMatchers("/api/v1/authenticate","/api/v1/assetentry","/api/v1/assetUpdate","/api/v1/assetUpdate/**","/ws/**","/api/v2/assetHis/**","/api/v2/assetHis").permitAll().
                 // all other requests need to be authenticated
                         anyRequest().authenticated().and().
                 // make sure we use stateless session; session won't be used to

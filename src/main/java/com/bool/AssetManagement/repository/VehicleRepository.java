@@ -17,4 +17,5 @@ public interface VehicleRepository extends MongoRepository<AssetHistory, Integer
     boolean existsByBookingID(UUID bookingId);
     void deleteByBookingID(UUID bookingId);
     Optional<AssetHistory> findByBookingID(UUID bookingId);
+    void findByRegNo(String regNo);
 }

@@ -7,6 +7,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 
 import java.sql.Timestamp;
+import java.util.Date;
 import java.util.UUID;
 
 
@@ -16,21 +17,17 @@ import java.util.UUID;
 @NoArgsConstructor
 //@Entity
 public class AssetHistory {
-
-
      String regNo; //regno
      int charge; //console //charge at the end of ride
      String username;  //booking // username might be same
      int initMeterReading; //booking
      int finalMeterReading; //booking
      int rideCount; //
-     java.sql.Timestamp initTime; //booking
-     Timestamp dropTime; //booking
+     Date initTime; //booking
+     Date dropTime; //booking
      int totalDistance; //
-     String feedbackOrComments; //booking
-     //String status; //booking
+     // String feedbackOrComments; //booking
+      String status; //booking
      String station; //booking
-     @Id
      UUID bookingID;
-
 }

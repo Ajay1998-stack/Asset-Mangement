@@ -21,7 +21,7 @@ import java.util.UUID;
 import static java.lang.Integer.parseInt;
 
 @RestController
-@CrossOrigin(origins = "http://localhost:4200")
+@CrossOrigin(origins = "*")
 @RequestMapping(value = "api/v2")
 public class AssetHistoryController {
     private AssetManagementService assetManagementService;
