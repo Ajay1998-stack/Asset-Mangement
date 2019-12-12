@@ -89,7 +89,7 @@ public class AssetHistoryController {
     }
 
     @GetMapping("user/{id1}/{id2}")
-    public ResponseEntity<?> getUsername(@PathVariable("id1") UUID id,@PathVariable("id2") int rideCount){
+    public ResponseEntity<?> getUsername(@PathVariable("id1") UUID id,@PathVariable("id2") long rideCount){
         ResponseEntity responseEntity;
         try {
             return new ResponseEntity<>(assetManagementService.getUsername(rideCount, id), HttpStatus.OK);

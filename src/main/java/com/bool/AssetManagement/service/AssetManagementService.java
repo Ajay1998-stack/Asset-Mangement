@@ -15,6 +15,6 @@ public interface AssetManagementService {
      List getAllVehicles() ;
      AssetHistory updateVehicle(AssetHistory assetHistory) throws BookingNotFoundException;
      boolean deleteVehicle(UUID bookingId)  throws BookingNotFoundException;
-     String getUsername(int rideCount,UUID bookingId) throws BookingNotFoundException;
+     String getUsername(long rideCount,UUID bookingId) throws BookingNotFoundException;
      String getRideCount(UUID bookingId) throws BookingNotFoundException;
 }

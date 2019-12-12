@@ -63,7 +63,7 @@ public class AssetManagementServieImpl implements AssetManagementService {
     }
 
     @Override
-    public String getUsername(int rideCount,UUID bookingId) throws BookingNotFoundException{
+    public String getUsername(long rideCount,UUID bookingId) throws BookingNotFoundException{
         if(!(vehicleRepository.existsByBookingID(bookingId))){
             throw new BookingNotFoundException("Cant retrieve UserName. Vehicle Not Found");
         }

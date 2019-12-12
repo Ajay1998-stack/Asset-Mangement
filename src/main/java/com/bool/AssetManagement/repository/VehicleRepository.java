@@ -13,9 +13,9 @@ import java.util.UUID;
 public interface VehicleRepository extends MongoRepository<AssetHistory, Integer> {
 //            "SELECT v FROM Vehicle v WHERE WHEREv.no = :no AND v.rideCount= :rideCount"
     @Query(value = "{'id': ?0 , 'rideCount': ?1}")
-    AssetHistory rideOfVehicle(UUID bookingId, int rideCount);
+    AssetHistory rideOfVehicle(UUID bookingId, long rideCount);
     boolean existsByBookingID(UUID bookingId);
     void deleteByBookingID(UUID bookingId);
     Optional<AssetHistory> findByBookingID(UUID bookingId);
-    void findByRegNo(String regNo);
+    long countByRegNo(String regNo);
 }

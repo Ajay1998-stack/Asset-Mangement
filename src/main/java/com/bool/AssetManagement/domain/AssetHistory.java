@@ -22,7 +22,7 @@ public class AssetHistory {
      String username;  //booking // username might be same
      int initMeterReading; //booking
      int finalMeterReading; //booking
-     int rideCount; //
+     long rideCount; //
      Date initTime; //booking
      Date dropTime; //booking
      int totalDistance; //

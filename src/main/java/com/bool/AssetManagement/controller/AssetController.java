@@ -3,6 +3,7 @@ package com.bool.AssetManagement.controller;
 import com.bool.AssetManagement.domain.*;
 import com.bool.AssetManagement.exceptions.BookingAlreadyExistsException;
 import com.bool.AssetManagement.repository.AuthDetailsRepository;
+import com.bool.AssetManagement.repository.VehicleRepository;
 import com.bool.AssetManagement.service.*;
 import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,16 +33,18 @@ import static java.lang.Integer.parseInt;
 public class AssetController {
 
     private SimpMessagingTemplate template;
+    private SimpMessagingTemplate template2;
     private JwtTokenUtil jwtTokenUtil;
     private JwtUserDetailsService userDetailsService;
     private AssetCRUDService assetCRUDService;
     private AuthenticationManager authenticationManager;
     private CredentialStoringService credentialStoringService;
     private AssetManagementService assetManagementService;
+    private VehicleRepository vehicleRepository;
 
 
     @Autowired
-    public  AssetController(AssetCRUDService assetCRUDService,AuthenticationManager authenticationManager,SimpMessagingTemplate template,JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService,CredentialStoringService credentialStoringService,AssetManagementService assetManagementService){
+    public  AssetController(AssetCRUDService assetCRUDService,AuthenticationManager authenticationManager,SimpMessagingTemplate template,JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService,CredentialStoringService credentialStoringService,AssetManagementService assetManagementService,VehicleRepository vehicleRepository,SimpMessagingTemplate template2){
 
         this.assetCRUDService = assetCRUDService;
         this.authenticationManager=  authenticationManager;
@@ -50,6 +53,8 @@ public class AssetController {
         this.userDetailsService = userDetailsService;
         this.credentialStoringService = credentialStoringService;
         this.assetManagementService = assetManagementService;
+        this.vehicleRepository = vehicleRepository;
+        this.template2 = template2;
 
     }
 
@@ -195,9 +200,9 @@ public class AssetController {
         AdminObject adminObject  = new AdminObject();
         adminObject.setRegNo((rideEnd.getVehicle_id()));
         adminObject.setStation(rideEnd.getEnd_station());
-        adminObject.setStatus(rideEnd.getVehicle_status());
+        adminObject.setStatus("Available");
         adminObject.setFeedbackOrComments(rideEnd.getComments());
-        template.convertAndSend("/topic/history",adminObject);
+        template.convertAndSend("/topic/adminUI",adminObject);
 
 
         AssetHistory assetHistory = new AssetHistory();
@@ -212,6 +217,11 @@ public class AssetController {
         assetHistory.setStation(rideEnd.getEnd_station());
         assetHistory.setTotalDistance(rideEnd.getFinal_meter_reading()-rideEnd.getInitial_meter_reading());
         assetHistory.setBookingID(rideEnd.getBooking_id());
+        assetHistory.setRideCount(vehicleRepository.countByRegNo(assetHistory.getRegNo())+1);
+        System.out.println(assetHistory.getRideCount()+1);
+        template2.convertAndSend("/topic/history",assetHistory);
+
+
 
         try {
             assetManagementService.saveVehicle(assetHistory);
