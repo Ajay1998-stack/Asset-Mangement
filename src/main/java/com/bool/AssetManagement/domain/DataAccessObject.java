@@ -11,7 +11,6 @@ import org.springframework.data.mongodb.core.mapping.Document;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DataAccessObject {
-    @Id
     private String regNo;
     private String password;
 }

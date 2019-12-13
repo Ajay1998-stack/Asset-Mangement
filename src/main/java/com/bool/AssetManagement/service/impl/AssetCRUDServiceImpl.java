@@ -90,4 +90,13 @@ public class AssetCRUDServiceImpl implements AssetCRUDService {
             throw new StorageException(msg, e);
         }
     }
+
+    @Override
+    public int meterReading(String regNo) throws VehicleNotFoundException {
+        if(!(assetDetailsRepository.existsByRegNo(regNo))){
+            throw new VehicleNotFoundException(" Asset with that RegNo Not Found");
+        }
+        Asset asset = assetDetailsRepository.findByRegNo(regNo);
+        return asset.getMeterReading();
+    }
 }

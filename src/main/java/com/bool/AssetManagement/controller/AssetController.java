@@ -2,10 +2,11 @@ package com.bool.AssetManagement.controller;
 
 import com.bool.AssetManagement.domain.*;
 import com.bool.AssetManagement.exceptions.BookingAlreadyExistsException;
-import com.bool.AssetManagement.repository.AuthDetailsRepository;
+import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
+import com.bool.AssetManagement.exceptions.VehicleNotFoundException;
+import com.bool.AssetManagement.repository.AssetDetailsRepository;
 import com.bool.AssetManagement.repository.VehicleRepository;
 import com.bool.AssetManagement.service.*;
-import com.bool.AssetManagement.exceptions.VehicleAlreadyExistsException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.api.services.drive.model.File;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -25,7 +26,6 @@ import java.io.IOException;
 import java.util.List;
 
 import static com.bool.AssetManagement.service.CreateGoogleFile.createGoogleFile;
-import static java.lang.Integer.parseInt;
 
 @RestController
 @CrossOrigin("*")
@@ -41,10 +41,11 @@ public class AssetController {
     private CredentialStoringService credentialStoringService;
     private AssetManagementService assetManagementService;
     private VehicleRepository vehicleRepository;
+    private AssetDetailsRepository assetDetailsRepository;
 
 
     @Autowired
-    public  AssetController(AssetCRUDService assetCRUDService,AuthenticationManager authenticationManager,SimpMessagingTemplate template,JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService,CredentialStoringService credentialStoringService,AssetManagementService assetManagementService,VehicleRepository vehicleRepository,SimpMessagingTemplate template2){
+    public  AssetController(AssetCRUDService assetCRUDService,AuthenticationManager authenticationManager,SimpMessagingTemplate template,JwtTokenUtil jwtTokenUtil, JwtUserDetailsService userDetailsService,CredentialStoringService credentialStoringService,AssetManagementService assetManagementService,VehicleRepository vehicleRepository,SimpMessagingTemplate template2, AssetDetailsRepository  assetDetailsRepository){
 
         this.assetCRUDService = assetCRUDService;
         this.authenticationManager=  authenticationManager;
@@ -55,12 +56,13 @@ public class AssetController {
         this.assetManagementService = assetManagementService;
         this.vehicleRepository = vehicleRepository;
         this.template2 = template2;
+        this.assetDetailsRepository = assetDetailsRepository;
 
     }
 
     @PostMapping("/assetentry" )
     public ResponseEntity<?> SaveAsset(@RequestParam String asset,@RequestParam MultipartFile image){
-        ResponseEntity responseEntity;
+        ResponseEntity<?> responseEntity;
         try {
             Asset jsonAsset = new ObjectMapper().readValue(asset, Asset.class);
             System.out.println(jsonAsset);
@@ -89,7 +91,7 @@ public class AssetController {
 
     @GetMapping("/assetentry")
     public ResponseEntity<?> getAllVehicles() {
-        ResponseEntity responseEntity;
+        ResponseEntity<?> responseEntity;
         try{
         return new ResponseEntity<List<Asset>>(assetCRUDService.getAllAssets(),HttpStatus.OK);
         }catch (IOException ex){
@@ -179,6 +181,7 @@ public class AssetController {
         return  new ResponseEntity<String>("asdasd", HttpStatus.OK);
     }
 
+
     @KafkaListener(topics = "KafkaStartRide", groupId = "group_json",containerFactory = "userKafkaListenerFactory")
     public void consumeJson(RideStart rideStart) {
         System.out.println("Consumed JSON Message: " + rideStart);
@@ -192,6 +195,17 @@ public class AssetController {
     }
 
 
+    @GetMapping("/consoleEntry/{regNo}")
+    public ResponseEntity<?> getMeterReading(@PathVariable("regNo") String regNo) {
+        ResponseEntity responseEntity;
+        try{
+            return new ResponseEntity<>(assetCRUDService.meterReading(regNo),HttpStatus.OK);
+        }catch (VehicleNotFoundException ex){
+            responseEntity = new ResponseEntity<String>(ex.getMessage(),HttpStatus.CONFLICT);
+        }
+        return responseEntity;
+    }
+
     @KafkaListener(topics = "KafkaEndRide", groupId = "group_json2",containerFactory = "userKafkaListenerFactory2")
     public void consumeJson(RideEnd rideEnd) throws VehicleAlreadyExistsException {
         System.out.println("Consumed JSON Message: " + rideEnd);
@@ -203,6 +217,9 @@ public class AssetController {
         adminObject.setStatus("Available");
         adminObject.setFeedbackOrComments(rideEnd.getComments());
         template.convertAndSend("/topic/adminUI",adminObject);
+
+
+        assetDetailsRepository.updateAssetEntryEndride(rideEnd.getVehicle_id(), rideEnd.getVehicle_status());
 
 
         AssetHistory assetHistory = new AssetHistory();
